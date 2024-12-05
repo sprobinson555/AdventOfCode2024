@@ -28,23 +28,37 @@ fn main() {
         for level in report.split_whitespace() {
             levels.push(level.parse().unwrap());
         }
-        
-        let mut safe :bool = true;
-        if levels.is_sorted_by(|a, b| a < b) || levels.is_sorted_by(|a, b| a > b) {
-            for level_num in 1..levels.len() {
-                if (levels[level_num] - levels[level_num - 1]).abs() > 3 {
-                    safe = false;
-                    break;
-
+        let mut safe = false;
+        for problem_child in 0..levels.len() {
+            let mut sub_levels : Vec<&i32> = vec![];
+            for i in 0..levels.len() {
+                if i != problem_child {
+                    sub_levels.push(&levels[i]);
                 }
             }
+            if check_report_safety(&sub_levels) {
+                safe = true;
+                break;
+            }
         }
-        else {
-            safe = false;
-        }
+        
         if safe {
             safety_total = safety_total + 1;
         }
     }
-    println!("total number of safe reports is {safety_total}");
+    println!("total number of safe items is {safety_total}");
+}
+
+fn check_report_safety(report: &Vec<&i32>) -> bool {
+    if report.is_sorted_by(|a, b| a < b) || report.is_sorted_by(|a, b| a > b) {
+        for level_num in 1..report.len() {
+            if (report[level_num] - report[level_num - 1]).abs() > 3 {
+                return false;
+            }
+        }
+    }
+    else {
+        return false;
+    }
+    true
 }
