@@ -33,7 +33,7 @@ fn main() {
     list1.sort();
     list2.sort();
 
-    
+
     let mut diff :i32 = 0;
     for i in 0..list1.len() {
         let left = list1[i];
@@ -42,6 +42,22 @@ fn main() {
         // println!("left list = {left}  right list = {right}");
         // println!("new diff is {diff}");
     }
-
     println!("difference is {diff}");
+
+    let mut similarity_score:i32 = 0;
+    for item1 in &list1 {
+        let mut copies = 0;
+        for item2 in &list2 {
+            if item2 == item1 {
+                copies = copies+1;
+            }
+            if item2 > item1 {
+                break;
+            }
+        }
+        similarity_score = similarity_score + (item1 * copies);
+    }
+
+    println!("similarity score is {similarity_score}");
+
 }
