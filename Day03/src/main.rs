@@ -28,5 +28,4 @@ fn main() {
     println!();
     println!("The sum is: {sum}");
 
-
 }
