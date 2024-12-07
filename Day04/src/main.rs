@@ -1,12 +1,13 @@
 use std::env;
 use std::fs;
 
-const X :u8 = "X".as_bytes()[0];
-const M :u8 = "M".as_bytes()[0];
-const A :u8 = "A".as_bytes()[0];
-const S :u8 = "S".as_bytes()[0];
-const xmas_arr:[&u8; 4] = [&X, &M, &A, &S];
-    
+mod grid_traversal;
+use grid_traversal::{
+    Position,
+    Velocity,
+    Unit_Velocity
+};
+
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -20,16 +21,39 @@ fn main() {
     let contents = fs::read_to_string(filepath).expect("Cannot read contents of file");
 
 
-    let mut word_map = vec![];
+    let mut word_map: Vec<Vec<char>> = vec![];
     for line in contents.lines()
     {
-        word_map.push(line.as_bytes());
+        word_map.push(line.chars().collect());
     }
+
+    let search_string = String::from("XMAS");
 
     let mut total = 0;
     for y in 0..word_map.len() {
         for x in 0..word_map[0].len() {
-            if check_right(&word_map, y, x) {
+            if search_direction(&word_map, &search_string, y, x, &Unit_Velocity::UP) {
+                total = total + 1;
+            }
+            if search_direction(&word_map, &search_string, y, x, &Unit_Velocity::UP_RIGHT) {
+                total = total + 1;
+            }
+            if search_direction(&word_map, &search_string, y, x, &Unit_Velocity::RIGHT) {
+                total = total + 1;
+            }
+            if search_direction(&word_map, &search_string, y, x, &Unit_Velocity::DOWN_RIGHT) {
+                total = total + 1;
+            }
+            if search_direction(&word_map, &search_string, y, x, &Unit_Velocity::DOWN) {
+                total = total + 1;
+            }
+            if search_direction(&word_map, &search_string, y, x, &Unit_Velocity::DOWN_LEFT) {
+                total = total + 1;
+            }
+            if search_direction(&word_map, &search_string, y, x, &Unit_Velocity::LEFT) {
+                total = total + 1;
+            }
+            if search_direction(&word_map, &search_string, y, x, &Unit_Velocity::UP_LEFT) {
                 total = total + 1;
             }
         }
@@ -38,24 +62,16 @@ fn main() {
     println!("{total}");
 }
 
-fn check_right(word_map :&Vec<&[u8]>, y :usize, x :usize) -> bool{
-    if x > (word_map[y].len() - 4) {
-        return false;
+fn search_direction(word_map :&Vec<Vec<char>>, cypher :&String,  y :usize, x :usize, direction :&Velocity) -> bool{
+    let mut root = Position::new(y, x, Some(word_map.len()), Some(word_map[0].len()));
+    let mut word = String::new();
+    for i in 0..4 {
+        word.push(word_map[root.y][root.x]);
+        root.apply_velocity(direction);
     }
-    let wut :[&u8; 4] = [&word_map[y][x], &word_map[y][x+1], &word_map[y][x+2], &word_map[y][x+3]];
-    if wut == xmas_arr {
+    if &word == cypher {
         return true;
     }
     return false;
 }
 
-fn check_left(word_map :&Vec<&[u8]>, y :usize, x :usize) -> bool{
-    if x < 3 {
-        return false;
-    }
-    let wut :[&u8; 4] = [&word_map[y][x], &word_map[y][x-1], &word_map[y][x-2], &word_map[y][x-3]];
-    if wut == xmas_arr {
-        return true;
-    }
-    return false;
-}
