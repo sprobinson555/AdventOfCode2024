@@ -1,3 +1,4 @@
+
 use std::env;
 use std::fs;
 
@@ -59,13 +60,22 @@ fn main() {
         }
     }
 
-    println!("{total}");
+    println!("XMAS COUNT = {total}");
+    /*****************************PART 1 COMPLETE******************************************/
+    total = 0;
+    for y in 0..word_map.len() {
+        for x in 0..word_map[0].len() {
+            total = total + check_mas_x(&word_map, y, x)
+        }
+    }
+
+    println!("X-MAS COUNT = {total}");
 }
 
 fn search_direction(word_map :&Vec<Vec<char>>, cypher :&String,  y :usize, x :usize, direction :&Velocity) -> bool{
     let mut root = Position::new(y, x, Some(word_map.len()), Some(word_map[0].len()));
     let mut word = String::new();
-    for i in 0..4 {
+    for i in 0..cypher.len() {
         word.push(word_map[root.y][root.x]);
         root.apply_velocity(direction);
     }
@@ -73,5 +83,37 @@ fn search_direction(word_map :&Vec<Vec<char>>, cypher :&String,  y :usize, x :us
         return true;
     }
     return false;
+}
+
+fn check_mas_x(word_map :&Vec<Vec<char>>, y:usize, x:usize) -> i32 {
+    let AS = String::from("AS");
+    let AM = String::from("AM");
+    let mut count = 0;
+    
+    if (search_direction(word_map, &AS, y, x, &Unit_Velocity::UP_RIGHT) &&
+        search_direction(word_map, &AS, y, x, &Unit_Velocity::DOWN_RIGHT) &&
+        search_direction(word_map, &AM, y, x, &Unit_Velocity::DOWN_LEFT) &&
+        search_direction(word_map, &AM, y, x, &Unit_Velocity::UP_LEFT)) {
+            count = count+1;
+    }
+    if (search_direction(word_map, &AS, y, x, &Unit_Velocity::DOWN_RIGHT) &&
+        search_direction(word_map, &AS, y, x, &Unit_Velocity::DOWN_LEFT) &&
+        search_direction(word_map, &AM, y, x, &Unit_Velocity::UP_LEFT) &&
+        search_direction(word_map, &AM, y, x, &Unit_Velocity::UP_RIGHT)) {
+            count = count+1;
+    }
+    if (search_direction(word_map, &AS, y, x, &Unit_Velocity::DOWN_LEFT) &&
+        search_direction(word_map, &AS, y, x, &Unit_Velocity::UP_LEFT) &&
+        search_direction(word_map, &AM, y, x, &Unit_Velocity::UP_RIGHT) &&
+        search_direction(word_map, &AM, y, x, &Unit_Velocity::DOWN_RIGHT)) {
+            count = count+1;
+    }
+    if (search_direction(word_map, &AS, y, x, &Unit_Velocity::UP_LEFT) &&
+        search_direction(word_map, &AS, y, x, &Unit_Velocity::UP_RIGHT) &&
+        search_direction(word_map, &AM, y, x, &Unit_Velocity::DOWN_RIGHT) &&
+        search_direction(word_map, &AM, y, x, &Unit_Velocity::DOWN_LEFT)) {
+            count = count+1;
+    }
+    return count;
 }
 
