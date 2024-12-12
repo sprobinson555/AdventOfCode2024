@@ -21,7 +21,9 @@ fn main() {
     let contents = fs::read_to_string(filepath).expect("Cannot read contents of file");
 
     let mut rules :Vec<(i32, i32)> = vec![];
-    let mut pages :Vec<Vec<i32>> = vec![]; 
+    let mut pages :Vec<Vec<i32>> = vec![];
+
+    // parse the inputs
     for line in contents.lines() {
         if line.contains("|") {
             let mut nums = line.split('|');
@@ -36,8 +38,28 @@ fn main() {
             pages.push(page);
         }
     }
+    
+    // println!("rules:\r\n {:?}", rules); 
+    // println!("pages:\r\n {:?}", pages);
 
-    println!("rules:\r\n {:?}", rules);
-    println!("pages:\r\n {:?}", pages);
+    let mut sum_of_middles = 0;
+    for page in pages {
+        let mut valid = true;
+        for (index, num) in page.iter().enumerate() {
+            for rule in rules.iter().filter(|(a, b)| a == num) {
+                if page[0..index].contains(&rule.1) {
+                    valid = false;
+                }
+            }
+        }
+        println!("{:?} validity is {valid}", page);
+        if valid {
+            let middle = &page[page.len()/2];
+            println!("the middle number is {middle}");
+            sum_of_middles = sum_of_middles + middle;
+        }
+    }
+
+    println!("sum of middles is {sum_of_middles}");
 
 }
