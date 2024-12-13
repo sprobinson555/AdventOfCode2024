@@ -42,59 +42,47 @@ fn main() {
     // println!("rules:\r\n {:?}", rules); 
     // println!("pages:\r\n {:?}", pages);
 
-    let mut sum_of_middles = 0;
-    let pages_copy :Vec<Vec<i32>> = vec![];
+    let mut sum_of_valids = 0;
+    let mut sum_of_invalids = 0;
 
-    for page in pages.iter() {
-        let mut valid = true;
-        for (index, num) in page.iter().enumerate() {
-            for rule in rules.iter().filter(|(a, b)| a == num) {
-                if page[0..index].contains(&rule.1) {
-                    valid = false;
-                }
-            }
-        }
-        println!("{:?} validity is {valid}", page);
-        if valid {
-            let middle = &page[page.len()/2];
-            println!("the middle number is {middle}");
-            sum_of_middles = sum_of_middles + middle;
-        }
-    }
-
-    println!("sum of middles is {sum_of_middles}\r\n");
-
-    /************************************ PART TWO  **********************************/
-
-    let mut sum_of_middles = 0;
     for page in pages.iter() {
         let mut valid = true;
         let mut new_page :Vec<i32> = vec![];
-        for (index, num) in page.iter().enumerate() {
-            let index_to_insert = page_item_breaks_rules(index, num, &new_page, &rules);
-            if  index_to_insert != new_page.len() {
+        for item in page {
+            new_page.push(*item);
+        }
+        // for (index, num) in new_page.iter_mut().enumerate().rev()
+        for index in (0..new_page.len()).rev() {
+            let mut violator_index = check_previous_entries(index, &new_page, &rules);
+            while violator_index != new_page.len() {
                 valid = false;
-                new_page.insert(index_to_insert, *num);
-            }
-            else {
-                new_page.push(*num);
+                let num = new_page[index];
+                new_page.remove(index);
+                new_page.insert(violator_index, num);
+                violator_index = check_previous_entries(index, &new_page, &rules)
             }
         }
         println!("{:?} validity is {valid}", page);
         println!("new page is {:?}", new_page);
+        let middle = &new_page[new_page.len()/2];
+        println!("the middle number is {middle}");
         if valid {
-            let middle = &page[page.len()/2];
-            println!("the middle number is {middle}");
-            sum_of_middles = sum_of_middles + middle;
+            sum_of_valids = sum_of_valids + middle;
+        }
+        else {
+            sum_of_invalids = sum_of_invalids + middle;
         }
     }
-
-
+    println!("the sum of the valid pages is {sum_of_valids}");
+    println!("the sum of the invalid pages is {sum_of_invalids}");
 }
 
-fn page_item_breaks_rules(index :usize, num: &i32, page: &Vec<i32>, rules :&Vec<(i32, i32)>) -> usize {
-    for rule in rules.iter().filter(|(a, b)| a == num) {
-        for (slice_index, item) in page[0..index].iter().enumerate() {
+
+
+
+fn check_previous_entries(index :usize, page: &Vec<i32>, rules :&Vec<(i32, i32)>) -> usize {
+    for (slice_index, item) in page[0..index].iter().enumerate() {
+        for rule in rules.iter().filter(|(a, b)| a == &page[index]) {
             if item == &rule.1 {
                 return slice_index;
             }   
