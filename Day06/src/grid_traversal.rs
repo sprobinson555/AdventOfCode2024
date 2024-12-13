@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct Position {
     pub y :usize,
     pub x :usize,
@@ -6,32 +7,36 @@ pub struct Position {
 }
 
 impl Position {
-    pub fn apply_velocity(&mut self, vel :&Velocity) {
+    pub fn apply_velocity(&mut self, vel :&Velocity) -> bool {
         let new_x = (self.x as isize) + vel.x;
         let new_y = (self.y as isize) + vel.y;
 
         let mut can_apply = true;
+        
         
         if let Some(y_max) = self.y_max {
             if new_y >= y_max as isize {
                 can_apply = false;
             }
         }
+
         if let Some(x_max) = self.x_max {
             if new_x >= x_max as isize {
                 can_apply = false;
             }
         }
+
         if new_y < 0 || new_x < 0 {
             can_apply = false;
         }
-        
+
         if can_apply {
             self.y = new_y as usize;
             self.x = new_x as usize;
+            return true;
         }
+        return false;
     }
-
 
     pub fn new_default() -> Self {
         let pos = Position {
@@ -62,6 +67,7 @@ impl Position {
     }
 }
 
+#[derive(PartialEq, Debug)]
 pub struct Velocity {
     pub y :isize,
     pub x :isize,
